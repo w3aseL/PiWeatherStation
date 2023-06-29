@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Pi Weather Station - Chart</title>
+  <link rel="shortcut icon" href="../assets/logo.ico" type="image/x-icon">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="../css/chart.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.0/dist/chart.umd.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+</head>
+<body>
+  <input name="chart-type" value="rain" hidden />
+	<div id="root">
+    <img class="background-img" src="../assets/rain-clipart.png" alt="rain-logo" />
+    <div class="w-100 d-flex z-index-0">
+      <img src="../assets/weather.png" alt="weather-logo" class="logo" />
+      <div class="d-flex flex-column">
+        <h3 class="w-auto mt-2 mb-0"><i class="fab fa-raspberry-pi"></i> Pi Weather Station</h3>
+        <h5 class="w-auto mb-0"><em>Elapsed Rainfall Over Time</em></h5>
+        <h6 class="text-muted w-auto mb-auto" id="entry-date">{date}</h6>
+      </div>
+      <div class="d-flex flex-column ms-auto me-4">
+        <h6 class="w-auto mt-2 text-muted"><em class="me-1">Pierre Part, LA</em><i class="fas fa-location-arrow location-logo"></i></h6>
+      </div>
+    </div>
+    <canvas id="chart" class="chart z-index-0"></canvas>
+    <div class="w-100 d-flex z-index-0">
+      <h6 class="w-auto mt-auto mb-3 ms-3 me-auto text-muted">Generated at: <em id="gen-date">{date}</em></h6>
+      <img src="../assets/wsl-logo.png" alt="wsl-logo" class="logo-sm me-4 mb-2" />
+    </div>
+  </div>
+	<script src="../js/chart-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+/tests
+/data
+**/__pycache__
+/charting-tests
+**/.env
+**/node_modules
+**/package-lock.json
