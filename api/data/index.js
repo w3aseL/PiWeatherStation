@@ -1,6 +1,11 @@
 const { performDatabaseOperation } = require('../storage')
 const moment = require('moment-timezone')
 
+const { registerEvent, emitEvent } = require('../sockets/subscriptions')
+const { registerRequest } = require('../sockets')
+ 
+// Data points
+
 const ACCESS_KEY = 'M5nCSgbkvE';
 
 var rainArr = []
@@ -37,6 +42,20 @@ var dataStatus = {
     lastUpdated: null
   }
 }
+
+// Event registers
+registerEvent("update:rain")
+registerEvent("update:wind")
+registerEvent("update:temp")
+registerEvent("update:direction")
+registerEvent("update:pressure")
+
+// WebSocket requests
+registerRequest("current-data", (_, ws) => {
+  ws.json({ type: "data", payload: { eventName: "current-data", data: dataStatus } });
+})
+
+// Helper functions
 
 const verifyToken = (req, res, next) => {
   var token = req.headers['authorization'];
@@ -138,6 +157,8 @@ const updateTemp = (req, res, next) => {
     }
   }
 
+  emitEvent("update:temp", dataStatus.temp)
+
   performDatabaseOperation(conn => {
     conn.query(`INSERT INTO Temperature (TempC, TempF, Humidity, Timestamp) VALUES (${conn.escape(temp_c)}, ${conn.escape(temp_f)}, ${conn.escape(humidity)}, ${conn.escape(curDate)})`)
       .then(() => doNothing())
@@ -164,6 +185,8 @@ const updateWind = (req, res, next) => {
       lastUpdated: curDate
     }
   }
+
+  emitEvent("update:wind", dataStatus.windSpeed)
 
   performDatabaseOperation(conn => {
     conn.query(`INSERT INTO WindSpeed (AvgKmh, AvgMph, GustKmh, GustMph, Timestamp) VALUES (${conn.escape(kmh)}, ${conn.escape(mph)}, ${conn.escape(kmh_gust)}, ${conn.escape(mph_gust)}, ${conn.escape(curDate)})`)
@@ -201,6 +224,8 @@ const updateRain = (req, res, next) => {
     }
   }
 
+  emitEvent("update:rain", dataStatus.rain)
+
   performDatabaseOperation(conn => {
     conn.query(`INSERT INTO Rain (RainIn, RainCm, Timestamp) VALUES (${conn.escape(rin)}, ${conn.escape(cm)}, ${conn.escape(curDate)})`)
       .then(() => doNothing())
@@ -226,6 +251,8 @@ const updateWindDir = (req, res, next) => {
     },
   }
 
+  emitEvent("update:direction", dataStatus.windDir)
+
   performDatabaseOperation(conn => {
     conn.query(`INSERT INTO WindDirection (Direction, Timestamp) VALUES (${conn.escape(deg)}, ${conn.escape(curDate)})`)
       .then(() => doNothing())
@@ -250,6 +277,8 @@ const updatePressure = (req, res, next) => {
       lastUpdated: curDate
     }
   }
+
+  emitEvent("update:pressure", dataStatus.pressure)
 
   performDatabaseOperation(conn => {
     conn.query(`INSERT INTO AirPressure (Pressure, Timestamp) VALUES (${conn.escape(pressure)}, ${conn.escape(curDate)})`)
