@@ -1,6 +1,8 @@
 const { WebSocket } = require('ws');
 const { v4 } = require('uuid');
 
+const { closeUserSubscriptions, registerEvent, emitEvent, setWebSocketServer, getSubscribableEvents, subscribeUserToEvent, unsubscribeUserFromEvent } = require('./subscriptions')
+
 var requestProcessors = [];
 
 /**
@@ -52,13 +54,42 @@ const processNewConnection = connection => {
   });
 
   connection.on('close', (code, reason) => {
+    closeUserSubscriptions(connection.clientId);
+
     console.log(`Closed connection with identifier ${connection.clientId}. Code: ${code} -- Reason: ${reason ?? "N/A"}`);
   });
 
   connection.json({ type: "message", payload: "Welcome!" });
 };
 
+registerRequest("subscribe", (payload, ws) => {
+  try {
+    subscribeUserToEvent(ws.clientId, payload);
+
+    ws.json({ type: "message", payload: `Subscribed to event "${payload}"!` });
+  } catch (e) {
+    ws.json({ type: "error", payload: e.message });
+  }
+});
+
+registerRequest("unsubscribe", (payload, ws) => {
+  try {
+    unsubscribeUserFromEvent(ws.clientId, payload);
+
+    ws.json({ type: "message", payload: `Unsubscribed from event "${payload}"!` });
+  } catch (e) {
+    ws.json({ type: "error", payload: e.message });
+  }
+});
+
+registerRequest("event-list", (_, ws) => {
+  ws.json({ type: "data", payload: getSubscribableEvents });
+});
+
 module.exports = {
   processNewConnection,
-  registerRequest
+  registerRequest,
+  registerEvent,
+  emitEvent,
+  setWebSocketServer
 };

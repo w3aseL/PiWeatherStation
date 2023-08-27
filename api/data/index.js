@@ -1,8 +1,7 @@
 const { performDatabaseOperation } = require('../storage')
 const moment = require('moment-timezone')
 
-const { registerEvent, emitEvent } = require('../sockets/subscriptions')
-const { registerRequest } = require('../sockets')
+const { registerRequest, registerEvent, emitEvent } = require('../sockets')
  
 // Data points
 

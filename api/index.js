@@ -8,8 +8,7 @@ require('dotenv').config();
 const { verifyToken, getCurrentStatus, updateWind, updateRain, updateTemp, updateWindDir, updatePressure } = require('./data');
 const { initPort, genRouter } = require('./gen');
 const { statsRouter } = require('./stats');
-const { processNewConnection, registerRequest } = require('./sockets');
-const { setWebSocketServer } = require('./sockets/subscriptions');
+const { processNewConnection, registerRequest, setWebSocketServer } = require('./sockets');
 
 const app = express()
 const port = process.env.ENVIRONMENT === "production" ? 3000 : 8080;

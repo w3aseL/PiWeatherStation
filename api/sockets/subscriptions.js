@@ -1,5 +1,4 @@
 const { WebSocket, Server } = require('ws');
-const { registerRequest } = require('./');
 
 /** @type {Server} */
 var wsServer = null;
@@ -72,6 +71,13 @@ const unsubscribeUserFromEvent = (userIdentifier, event) => {
 
 /**
  * @param {string} userIdentifier 
+ */
+const closeUserSubscriptions = (userIdentifier) => {
+  activeSubscriptions = activeSubscriptions.filter(({ id }) => id != userIdentifier);
+}
+
+/**
+ * @param {string} userIdentifier 
  * @param {string} event 
  */
 const isSubscribed = (userIdentifier, event) => {
@@ -98,32 +104,14 @@ const emitEvent = (event, payload, forceEmit=false) => {
   });
 }
 
-registerRequest("subscribe", (payload, ws) => {
-  try {
-    subscribeUserToEvent(ws.clientId, payload);
-
-    ws.json({ type: "message", payload: `Subscribed to event "${payload}"!` });
-  } catch (e) {
-    ws.json({ type: "error", payload: e.message });
-  }
-});
-
-registerRequest("unsubscribe", (payload, ws) => {
-  try {
-    unsubscribeUserFromEvent(ws.clientId, payload);
-
-    ws.json({ type: "message", payload: `Unsubscribed from event "${payload}"!` });
-  } catch (e) {
-    ws.json({ type: "error", payload: e.message });
-  }
-});
-
-registerRequest("event-list", (_, ws) => {
-  ws.json({ type: "data", payload: subscribableEvents });
-});
+const getSubscribableEvents = () => subscribableEvents
 
 module.exports = {
   setWebSocketServer,
   registerEvent,
-  emitEvent
+  emitEvent,
+  closeUserSubscriptions,
+  getSubscribableEvents,
+  subscribeUserToEvent,
+  unsubscribeUserFromEvent
 };
